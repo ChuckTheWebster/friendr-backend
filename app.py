@@ -64,6 +64,19 @@ def upload_img():
            Because anyone could rename the extension of a file to be something else.
            What would happen if someone were to give some python script file an
            extension of .png ?
+
+           PIL verify()
+           https://pillow.readthedocs.io/en/stable/reference/Image.html#PIL.Image.Image.verify
+
+           OR
+
+           from PIL import Image
+            try:
+                image = Image.open(filename)
+                # do our uploading
+            except IOError:
+                # throw an error here that our file is not an image
+
         2. Should our content_type be "image/*"?
         3. Is there a better way to pass our bucket?
         4. Are we able to get the object url from the response?
