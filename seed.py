@@ -14,7 +14,7 @@ with open('generator/users.csv') as users:
 # with open('generator/messages.csv') as messages:
 #     db.session.bulk_insert_mappings(Message, DictReader(messages))
 
-# with open('generator/follows.csv') as follows:
+# with open('generator/likes.csv') as follows:
 #     db.session.bulk_insert_mappings(Follows, DictReader(follows))
 
 db.session.commit()

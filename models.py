@@ -6,7 +6,7 @@ from flask_bcrypt import Bcrypt
 bcrypt = Bcrypt()
 db = SQLAlchemy()
 
-DEFAULT_IMAGE_URL = "/static/images/default-pic.png"
+# DEFAULT_IMAGE_URL = "/static/images/default-pic.png"
 
 
 class User(db.Model):
@@ -54,7 +54,7 @@ class User(db.Model):
 
     image_url = db.Column(
         db.Text,
-        default=DEFAULT_IMAGE_URL,
+        nullable=False
     )
 
     bio = db.Column(
@@ -89,7 +89,7 @@ class User(db.Model):
         }
 
     @classmethod
-    def signup(cls, username, email, location, friend_radius, bio, password, first_name, last_name, image_url=DEFAULT_IMAGE_URL):
+    def signup(cls, username, email, location, friend_radius, bio, password, first_name, last_name, image_url):
         """Sign up user.
 
         Hashes password and adds user to system.
@@ -106,8 +106,7 @@ class User(db.Model):
             last_name=last_name,
             location=location,
             friend_radius=friend_radius,
-            bio=bio
-
+            bio=bio,
         )
 
         db.session.add(user)
@@ -147,6 +146,29 @@ class User(db.Model):
     #     found_user_list = [
     #         user for user in self.following if user == other_user]
     #     return len(found_user_list) == 1
+
+
+class Match(db.Model):
+    """Connection of a follower <-> followed_user."""
+
+    __tablename__ = 'matches'
+
+    user1_id = db.Column(
+        db.Integer,
+        db.ForeignKey('users.id', ondelete="cascade"),
+        primary_key=True,
+    )
+
+    user2_id = db.Column(
+        db.Integer,
+        db.ForeignKey('users.id', ondelete="cascade"),
+        primary_key=True,
+    )
+
+    is_liked = db.Column(
+        db.Boolean,
+        nullable=False
+    )
 
 
 #BOTTOM

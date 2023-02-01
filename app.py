@@ -5,28 +5,32 @@ from flask_cors import CORS
 from models import db, connect_db, User
 from flask import Flask
 from flask_restful import Resource, Api
+from sqlalchemy.exc import IntegrityError
+from forms import (UserAddForm)
 import uuid
+from werkzeug.datastructures import MultiDict
+from flask_wtf.csrf import CSRFProtect
 
 import boto3
 from dotenv import load_dotenv
 import os
 from werkzeug.utils import secure_filename
+load_dotenv()  # take environment variables from .env.
 
+# print(f"Bucket Name {BUCKET_NAME}")
 BUCKET_NAME = os.environ["BUCKET_NAME"]
 BUCKET_URL = os.environ["BUCKET_URL"]
-
 
 app = Flask(__name__)
 api = Api(app)
 CORS(app)
+csrf = CSRFProtect(app)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///friendr'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = True
+app.config['SECRET_KEY'] = os.environ['SECRET_KEY']
 
 connect_db(app)
-
-
-load_dotenv()  # take environment variables from .env.
 
 s3 = boto3.client(
     "s3",
@@ -105,3 +109,42 @@ def upload_image(path_to_file, bucket, filename, content_type):
                                              )
     print(f" ** Response - {upload_file_response}")
     return f"<img src='{BUCKET_URL}/{filename}' />"
+
+
+@app.route('/signup', methods=["POST"])
+@csrf.exempt
+def signup():
+    """Handle user signup.
+
+    Create new user and add to DB. Redirect to home page.
+
+    If form not valid, present form.
+
+    If the there already is a user with that username: flash message
+    and re-present form.
+    """
+
+    form = UserAddForm(MultiDict(request.get_json()),)
+    breakpoint()
+    #TODO Return token
+
+    if form.validate_on_submit():
+        try:
+            user = User.signup(
+                first_name=form.first_name.data,
+                last_name=form.last_name.data,
+                username=form.username.data,
+                password=form.password.data,
+                email=form.email.data,
+                image_url=form.image_url.data,
+                location=form.location.data,
+                bio=form.bio.data,
+                friend_radius=form.friend_radius.data
+            )
+            db.session.commit()
+
+        except IntegrityError:
+            pass
+
+    else:
+        pass
