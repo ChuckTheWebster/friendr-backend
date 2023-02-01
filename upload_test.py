@@ -17,14 +17,14 @@ s3 = boto3.client(
 for bucket in s3.list_buckets():
     print(bucket)
 
-objects = s3.list_objects_v2(Bucket="chucket")
+objects = s3.list_objects_v2(Bucket="myawstestbucketbucket")
 
 for obj in objects["Contents"]:
     print(obj["Key"])
 
-s3.upload_file("./test.txt", "chucket", "chuck.txt")
+s3.upload_file("./test.txt", "myawstestbucketbucket", "chuck.txt")
 
-test = s3.get_object(Bucket="chucket", Key="chuck.txt")
+test = s3.get_object(Bucket="myawstestbucketbucket", Key="chuck.txt")
 print(test["Body"].read())
 
 profile_image = f"{BASE_URL}/image.png"
