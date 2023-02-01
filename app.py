@@ -57,8 +57,13 @@ def get_uploader():
 def upload_img():
 
     """
-    Questions:
-        1. Are we handling extensions correctly?
+    TODO: Questions:
+        1. Are we handling extensions correctly? Should we create a white list
+           of allowed image extensions (ex: .jpg, .png)? Should we use a library
+           that can figure out the real extension of the file by reading it first?
+           Because anyone could rename the extension of a file to be something else.
+           What would happen if someone were to give some python script file an
+           extension of .png ?
         2. Should our content_type be "image/*"?
         3. Is there a better way to pass our bucket?
         4. Are we able to get the object url from the response?
