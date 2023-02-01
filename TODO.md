@@ -6,3 +6,11 @@
 - [] Once a user says yes or no to another shown user, they should not see this user again
 - [] If two users both say yes for friend match, they should be able to message each other
 
+
+
+
+Plan:
+- Have to finish implementing our models
+- Work on the login (Flask-Login), registration, and authentication (JWT tokens)
+    - Registration - upload profile pic
+-

@@ -85,14 +85,14 @@ def upload_img():
     """
 
     file = request.files["profile_img"]
+    content_type = file.content_type
     extension = secure_filename(file.filename).split(".")[1]
     new_filename = f"{uuid.uuid4()}.{extension}"
-    content_type = "image/png"
 
     bucket = BUCKET_NAME
-
     file_url = upload_image(file, bucket, new_filename, content_type)
 
+    # TODO: save this to user model
     return f"{file_url}"
 
 def upload_image(path_to_file, bucket, filename, content_type):
