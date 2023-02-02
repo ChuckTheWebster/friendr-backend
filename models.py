@@ -16,10 +16,10 @@ class User(db.Model):
 
     __tablename__ = 'users'
 
-    id = db.Column(
-        db.Integer,
-        primary_key=True,
-    )
+    # id = db.Column(
+    #     db.Integer,
+    #     primary_key=True,
+    # )
 
     first_name = db.Column(
         db.Text,
@@ -41,6 +41,7 @@ class User(db.Model):
         db.Text,
         nullable=False,
         unique=True,
+        primary_key=True,
     )
 
     location = db.Column(
@@ -163,15 +164,15 @@ class Match(db.Model):
 
     __tablename__ = 'matches'
 
-    user1_id = db.Column(
-        db.Integer,
-        db.ForeignKey('users.id', ondelete="cascade"),
+    user1_username = db.Column(
+        db.Text,
+        db.ForeignKey('users.username', ondelete="cascade"),
         primary_key=True,
     )
 
-    user2_id = db.Column(
-        db.Integer,
-        db.ForeignKey('users.id', ondelete="cascade"),
+    user2_username = db.Column(
+        db.Text,
+        db.ForeignKey('users.username', ondelete="cascade"),
         primary_key=True,
     )
 

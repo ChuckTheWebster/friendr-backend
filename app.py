@@ -128,7 +128,7 @@ def upload_image(path_to_file, bucket, filename, content_type):
 def login():
     """Handle user login. Returns a token. """
 
-    form = UserLoginForm(MultiDict(request.get_json()))
+    form = UserLoginForm()
 
     if form.validate_on_submit():
         user = User.authenticate(form.username.data, form.password.data)
@@ -187,3 +187,12 @@ def signup():
             return jsonify(error="User or email already taken.")
     else:
         return jsonify(erorrs=form.errors)
+
+
+#-------------
+
+@app.get('/users/<username>')
+def get_user(username):
+    user = User.query.get_or_404(username)
+
+    return jsonify(user=user.serialize)
