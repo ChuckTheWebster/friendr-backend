@@ -20,3 +20,13 @@ class UserAddForm(FlaskForm):
     location = StringField('Zip Code', validators=[InputRequired()])
     bio = StringField('Bio')
     friend_radius = IntegerField('Match Radius')
+
+
+class UserLoginForm(FlaskForm):
+    """Form for adding users."""
+    class Meta:
+        csrf=False
+
+    username = StringField('Username', validators=[InputRequired()])
+    password = PasswordField('Password', validators=[Length(min=6)])
+

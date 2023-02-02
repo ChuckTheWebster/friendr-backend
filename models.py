@@ -2,6 +2,8 @@
 
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
+import jwt
+
 
 bcrypt = Bcrypt()
 db = SQLAlchemy()
@@ -111,6 +113,14 @@ class User(db.Model):
 
         db.session.add(user)
         return user
+
+    @classmethod
+    def create_token(cls, user):
+        # TODO: import secret key instead of hard coding it
+        payload = {"username": user.username}
+        encoded_jwt = jwt.encode(payload, "adasdas", algorithm="HS256")
+        print("encoded_jwt", encoded_jwt)
+        return encoded_jwt
 
     @classmethod
     def authenticate(cls, username, password):

@@ -6,7 +6,7 @@ from models import db, connect_db, User
 from flask import Flask
 from flask_restful import Resource, Api
 from sqlalchemy.exc import IntegrityError
-from forms import (UserAddForm)
+from forms import (UserAddForm, UserLoginForm)
 import uuid
 from werkzeug.datastructures import MultiDict
 from flask_wtf.csrf import CSRFProtect
@@ -44,12 +44,21 @@ s3 = boto3.client(
 def test():
     return "Running"
 
+
 class UserView(Resource):
     def get(self):
         users = User.query.all()
         return jsonify(users=[u.serialize for u in users])
 
 api.add_resource(UserView, '/users')
+
+
+# class AuthViews(Resource):
+#     def post(self):
+
+# api.add_resource(UserView, '/auth')
+
+
 
 
 @app.get("/upload")
@@ -111,22 +120,40 @@ def upload_image(path_to_file, bucket, filename, content_type):
     return f"<img src='{BUCKET_URL}/{filename}' />"
 
 
-@app.route('/signup', methods=["POST"])
+
+
+
+# ======================== AUTH VIEWS ===========================
+
+# TODO: Do we use exempt or assign a csrf token to react?
+
+@app.post('/auth/token')
+@csrf.exempt
+def login():
+    """Handle user login. Returns a token. """
+
+    form = UserLoginForm(MultiDict(request.get_json()))
+
+    if form.validate_on_submit():
+        user = User.authenticate(form.username.data, form.password.data)
+
+        if user:
+            token = User.create_token(user)
+            return token
+
+        return jsonify(error="Invalid username or password.")
+    else:
+        return jsonify(errors=form.errors)
+
+
+# TODO: Do we use exempt or assign a csrf token to react?
+
+@app.post('/auth/register')
 @csrf.exempt
 def signup():
-    """Handle user signup.
+    """Handle user signup and returns a token. """
 
-    Create new user and add to DB. Redirect to home page.
-
-    If form not valid, present form.
-
-    If the there already is a user with that username: flash message
-    and re-present form.
-    """
-
-    form = UserAddForm(MultiDict(request.get_json()),)
-    breakpoint()
-    #TODO Return token
+    form = UserAddForm(MultiDict(request.get_json()))
 
     if form.validate_on_submit():
         try:
@@ -143,8 +170,10 @@ def signup():
             )
             db.session.commit()
 
-        except IntegrityError:
-            pass
+            token = User.create_token(user=user)
 
+            return (jsonify(token=token), 201)
+        except IntegrityError:
+            return jsonify(error="User or email already taken.")
     else:
-        pass
+        return jsonify(erorrs=form.errors)
