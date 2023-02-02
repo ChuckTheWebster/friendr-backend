@@ -151,13 +151,13 @@ def signup():
 
     print("in here")
     # breakpoint()
-    form = UserAddForm(MultiDict(request.form))
+    form = UserAddForm()
 
-    breakpoint()
+    # breakpoint()
 
     if form.validate_on_submit():
-        breakpoint()
-        file = form.file
+        # breakpoint()
+        file = form.file.data
         content_type = file.content_type
         extension = secure_filename(file.filename).split(".")[1]
         new_filename = f"{uuid.uuid4()}.{extension}"
