@@ -16,7 +16,7 @@ class UserAddForm(FlaskForm):
     username = StringField('Username', validators=[InputRequired()])
     email = StringField('E-mail', validators=[InputRequired(), Email()])
     password = PasswordField('Password', validators=[Length(min=6)])
-    image_url = FileField('Image URL', validators=[InputRequired()])
+    file = FileField('Select Image', validators=[InputRequired()])
     location = StringField('Zip Code', validators=[InputRequired()])
     bio = StringField('Bio')
     friend_radius = IntegerField('Match Radius')

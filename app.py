@@ -157,7 +157,7 @@ def signup():
 
     if form.validate_on_submit():
         breakpoint()
-        file = request.files["image_url"]
+        file = form.file
         content_type = file.content_type
         extension = secure_filename(file.filename).split(".")[1]
         new_filename = f"{uuid.uuid4()}.{extension}"
