@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, TextAreaField, IntegerField
+from wtforms import StringField, PasswordField, TextAreaField, IntegerField, FileField
 from wtforms.validators import DataRequired, Email, Length, InputRequired
 
 
@@ -16,7 +16,7 @@ class UserAddForm(FlaskForm):
     username = StringField('Username', validators=[InputRequired()])
     email = StringField('E-mail', validators=[InputRequired(), Email()])
     password = PasswordField('Password', validators=[Length(min=6)])
-    image_url = StringField('Image URL', validators=[InputRequired()])
+    image_url = FileField('Image URL', validators=[InputRequired()])
     location = StringField('Zip Code', validators=[InputRequired()])
     bio = StringField('Bio')
     friend_radius = IntegerField('Match Radius')

@@ -50,6 +50,7 @@ class UserView(Resource):
         users = User.query.all()
         return jsonify(users=[u.serialize for u in users])
 
+
 api.add_resource(UserView, '/users')
 
 
@@ -59,8 +60,6 @@ api.add_resource(UserView, '/users')
 # api.add_resource(UserView, '/auth')
 
 
-
-
 @app.get("/upload")
 def get_uploader():
     return render_template("uploader.html")
@@ -68,7 +67,6 @@ def get_uploader():
 
 @app.post("/upload")
 def upload_img():
-
     """
     TODO: Questions:
         1. Are we handling extensions correctly? Should we create a white list
@@ -108,19 +106,17 @@ def upload_img():
     # TODO: save this to user model
     return f"{file_url}"
 
+
 def upload_image(path_to_file, bucket, filename, content_type):
     # TODO: Move to helpers
 
     upload_file_response = s3.put_object(Body=path_to_file,
-                                             Bucket=bucket,
-                                             Key=filename,
-                                             ContentType=content_type
-                                             )
+                                         Bucket=bucket,
+                                         Key=filename,
+                                         ContentType=content_type
+                                         )
     print(f" ** Response - {upload_file_response}")
-    return f"<img src='{BUCKET_URL}/{filename}' />"
-
-
-
+    return f"{BUCKET_URL}/{filename}"
 
 
 # ======================== AUTH VIEWS ===========================
@@ -153,9 +149,23 @@ def login():
 def signup():
     """Handle user signup and returns a token. """
 
+    print("in here")
+
     form = UserAddForm(MultiDict(request.get_json()))
 
+    # breakpoint()
+
     if form.validate_on_submit():
+        breakpoint()
+        file = request.files["image_url"]
+        content_type = file.content_type
+        extension = secure_filename(file.filename).split(".")[1]
+        new_filename = f"{uuid.uuid4()}.{extension}"
+        bucket = BUCKET_NAME
+        file_url = upload_image(file, bucket, new_filename, content_type)
+
+
+
         try:
             user = User.signup(
                 first_name=form.first_name.data,
@@ -163,7 +173,7 @@ def signup():
                 username=form.username.data,
                 password=form.password.data,
                 email=form.email.data,
-                image_url=form.image_url.data,
+                image_url=file_url,
                 location=form.location.data,
                 bio=form.bio.data,
                 friend_radius=form.friend_radius.data
