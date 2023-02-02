@@ -150,10 +150,10 @@ def signup():
     """Handle user signup and returns a token. """
 
     print("in here")
-
+    breakpoint()
     form = UserAddForm(MultiDict(request.get_json()))
 
-    # breakpoint()
+    breakpoint()
 
     if form.validate_on_submit():
         breakpoint()
