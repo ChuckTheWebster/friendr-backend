@@ -40,18 +40,18 @@ s3 = boto3.client(
 )
 
 
-@app.get("/")
-def test():
-    return "Running"
+# @app.get("/")
+# def test():
+#     return "Running"
 
 
-class UserView(Resource):
-    def get(self):
-        users = User.query.all()
-        return jsonify(users=[u.serialize for u in users])
+# class UserView(Resource):
+#     def get(self):
+#         users = User.query.all()
+#         return jsonify(users=[u.serialize for u in users])
 
 
-api.add_resource(UserView, '/users')
+# api.add_resource(UserView, '/users')
 
 
 # class AuthViews(Resource):
@@ -190,6 +190,13 @@ def signup():
 
 
 #-------------
+
+
+@app.get("/matcher")
+def match_maker():
+    users = User.query.all()
+    return jsonify(users=[u.serialize for u in users])
+
 
 @app.get('/users/<username>')
 def get_user(username):

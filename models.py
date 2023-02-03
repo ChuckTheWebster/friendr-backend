@@ -86,9 +86,12 @@ class User(db.Model):
 
     @property
     def serialize(self):
-        return {"username": self.username,
+        return {
+            "username": self.username,
+            "first_name": self.first_name,
             "bio": self.bio,
-            "location": self.location
+            "location": self.location,
+            "image": self.image_url
         }
 
     @classmethod
