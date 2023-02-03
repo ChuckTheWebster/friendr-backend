@@ -1,13 +1,11 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, TextAreaField, IntegerField, FileField
-from wtforms.validators import DataRequired, Email, Length, InputRequired
+from wtforms import StringField, PasswordField, IntegerField, FileField
+from wtforms.validators import Email, Length, InputRequired
 
-
-class CSRFProtection(FlaskForm):
-    """CSRFProtection form, intentionally left blank."""
 
 class UserAddForm(FlaskForm):
     """Form for adding users."""
+
     class Meta:
         csrf=False
 
@@ -23,7 +21,8 @@ class UserAddForm(FlaskForm):
 
 
 class UserLoginForm(FlaskForm):
-    """Form for adding users."""
+    """Form for logging in."""
+
     class Meta:
         csrf=False
 
