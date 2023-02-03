@@ -184,6 +184,14 @@ class Match(db.Model):
         nullable=False
     )
 
+    @classmethod
+    def createLikeStatus(user1, user2, is_liked):
+        m = Match(user1_username=user1, user2_username=user2, is_liked=is_liked)
+        db.session.add(m)
+        db.session.commit()
+
+        return m
+
 
 #BOTTOM
 def connect_db(app):

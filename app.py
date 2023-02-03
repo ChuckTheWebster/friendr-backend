@@ -2,7 +2,7 @@
 
 from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
-from models import db, connect_db, User
+from models import db, connect_db, User, Match
 from flask import Flask
 from flask_restful import Resource, Api
 from sqlalchemy.exc import IntegrityError
@@ -203,3 +203,13 @@ def get_user(username):
     user = User.query.get_or_404(username)
 
     return jsonify(user=user.serialize)
+
+@app.post('/likes')
+@csrf.exempt
+def like_or_dislike():
+    data = request.get_json()
+    breakpoint()
+    current_user = data["user1"]
+    match = Match.createLikeStatus(user1=current_user, user2=data["user2"], is_liked=data["like_status"])
+    db.session.commit()
+    return jsonify(status="ok")
