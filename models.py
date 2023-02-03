@@ -1,6 +1,7 @@
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 import jwt
+from datetime import datetime
 
 
 bcrypt = Bcrypt()
@@ -212,6 +213,56 @@ class Match(db.Model):
         db.session.add(m)
         db.session.commit()
         return m.receiver
+
+
+class Message(db.Model):
+
+    __tablename__ = 'messages'
+
+    id = db.Column(
+        db.Integer,
+        primary_key=True,
+    )
+
+    sender = db.Column(
+        db.Text,
+        db.ForeignKey('users.username', ondelete="cascade"),
+    )
+
+    receiver = db.Column(
+        db.Text,
+        db.ForeignKey('users.username', ondelete="cascade"),
+    )
+
+    message = db.Column(
+        db.Text,
+        nullable=False
+    )
+
+    timestamp = db.Column(
+    db.DateTime,
+    nullable=False,
+    default=datetime.utcnow,
+    )
+
+    @classmethod
+    def create_message(cls, u1, u2, msg_text):
+        m = Message(
+            sender=u1,
+            receiver=u2,
+            message=msg_text
+        )
+        db.session.add(m)
+        return m
+
+    @property
+    def serialize(self):
+        return {
+            "sender": self.sender,
+            "receiver": self.receiver,
+            "message": self.message,
+            "timestamp": self.timestamp,
+        }
 
 
 def connect_db(app):

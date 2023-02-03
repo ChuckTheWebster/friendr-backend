@@ -2,7 +2,7 @@
 
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from models import db, connect_db, User, Match
+from models import db, connect_db, User, Match, Message
 from sqlalchemy.exc import IntegrityError
 from forms import (UserAddForm, UserLoginForm)
 import uuid
@@ -153,3 +153,17 @@ def like_or_dislike():
     db.session.commit()
 
     return (jsonify(data=other_user), 201)
+
+@app.post('/users/<username>/messages')
+def send_message(username):
+    # receiver = User.query.get_or_404(username)
+    data = request.get_json()
+
+    message = Message.create_message(
+        u1=data["u1"],
+        u2=data["u2"],
+        msg_text=data["msg_text"]
+    )
+    db.session.commit()
+
+    return jsonify(message=message.serialize)
