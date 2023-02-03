@@ -128,6 +128,8 @@ def list_matches(username):
     current_user = User.query.get_or_404(username)
     matched_users = current_user.matches
 
+    # breakpoint()
+
     return jsonify(matches=[u.serialize for u in User.query.filter(User.username.in_(matched_users))])
 
 

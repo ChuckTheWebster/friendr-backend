@@ -87,19 +87,19 @@ class User(db.Model):
         matches = []
 
         users_I_like = Match.query.filter_by(
-            user1_username=self.username,
+            creator=self.username,
             is_liked=True
         ).all()
 
-        like += [match.user2_username for match in users_I_like]
+        like += [match.receiver for match in users_I_like]
 
         users_liked_by = Match.query.filter_by(
-            user2_username=self.username,
+            receiver=self.username,
             is_liked=True
 
         )
 
-        liked_by += [match.user1_username for match in users_liked_by]
+        liked_by += [match.creator for match in users_liked_by]
 
         for user in liked_by:
             if user in like:
@@ -114,17 +114,17 @@ class User(db.Model):
         results = []
 
         users_seen = Match.query.filter_by(
-            user1_username=self.username
+            creator=self.username
         ).all()
 
-        results += [match.user2_username for match in users_seen]
+        results += [match.receiver for match in users_seen]
 
         users_who_disliked = Match.query.filter_by(
-            user2_username=self.username,
+            receiver=self.username,
             is_liked=False
         )
 
-        results += [match.user1_username for match in users_who_disliked]
+        results += [match.creator for match in users_who_disliked]
         return results
 
 
@@ -157,7 +157,6 @@ class User(db.Model):
         # TODO: import secret key instead of hard coding it
         payload = {"username": user.username}
         encoded_jwt = jwt.encode(payload, "adasdas", algorithm="HS256")
-        print("encoded_jwt", encoded_jwt)
         return encoded_jwt
 
     @classmethod
@@ -186,13 +185,13 @@ class Match(db.Model):
 
     __tablename__ = 'matches'
 
-    user1_username = db.Column(
+    creator = db.Column(
         db.Text,
         db.ForeignKey('users.username', ondelete="cascade"),
         primary_key=True,
     )
 
-    user2_username = db.Column(
+    receiver = db.Column(
         db.Text,
         db.ForeignKey('users.username', ondelete="cascade"),
         primary_key=True,
@@ -206,13 +205,13 @@ class Match(db.Model):
     @classmethod
     def createLikeStatus(cls, u1, u2, is_liked):
         m = Match(
-            user1_username=u1,
-            user2_username=u2,
+            creator=u1,
+            receiver=u2,
             is_liked=is_liked
         )
         db.session.add(m)
         db.session.commit()
-        return m.user2_username
+        return m.receiver
 
 
 def connect_db(app):
