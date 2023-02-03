@@ -192,11 +192,32 @@ def signup():
 #-------------
 
 
-@app.get("/matcher")
-def match_maker():
-    users = User.query.all()
+@app.get("/matcher/<username>")
+def find_friends(username):
+    """
+    Finds users excluding currently logged in user.
+
+    TODO:
+        - Check currently logged in user matches username
+    """
+    current_user = User.query.filter_by(username=username).first()
+    exclude_users_list = current_user.exclude_users_in_match
+    exclude_users_list.append(str(current_user))
+
+    users = User.query.filter(User.username.not_in(exclude_users_list))
     return jsonify(users=[u.serialize for u in users])
 
+
+@app.get("/matches/<username>")
+def list_matches(username):
+    """ TODO: Show matches """
+
+    current_user = User.query.get_or_404(username)
+    matched_users = current_user.matches
+
+    return jsonify(matches=[u.serialize for u in User.query.filter(User.username.in_(matched_users))])
+
+    pass
 
 @app.get('/users/<username>')
 def get_user(username):
@@ -208,8 +229,8 @@ def get_user(username):
 @csrf.exempt
 def like_or_dislike():
     data = request.get_json()
-    breakpoint()
-    current_user = data["user1"]
-    match = Match.createLikeStatus(user1=current_user, user2=data["user2"], is_liked=data["like_status"])
+    # breakpoint()
+    match = Match.createLikeStatus(u1=data["u1"],u2=data["u2"],is_liked=data["like_status"])
+    print("match=", match)
     db.session.commit()
     return jsonify(status="ok")

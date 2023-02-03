@@ -1,5 +1,3 @@
-# from datetime import datetime
-
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 import jwt
@@ -8,18 +6,11 @@ import jwt
 bcrypt = Bcrypt()
 db = SQLAlchemy()
 
-# DEFAULT_IMAGE_URL = "/static/images/default-pic.png"
-
 
 class User(db.Model):
     """User in the system."""
 
     __tablename__ = 'users'
-
-    # id = db.Column(
-    #     db.Integer,
-    #     primary_key=True,
-    # )
 
     first_name = db.Column(
         db.Text,
@@ -69,20 +60,11 @@ class User(db.Model):
         nullable=False,
     )
 
-    # messages = db.relationship('Message', backref="user")
-
-    # followers = db.relationship(
-    #     "User",
-    #     secondary="follows",
-    #     primaryjoin=(Follows.user_being_followed_id == id),
-    #     secondaryjoin=(Follows.user_following_id == id),
-    #     backref="following",
-    # )
-
-    # liked_messages = db.relationship('Message', secondary="likes")
-
     def __repr__(self):
-        return f"<User #{self.id}: {self.username}, {self.email}>"
+        return f"<User: {self.username}, {self.email}>"
+
+    def __str__(self):
+        return self.username
 
     @property
     def serialize(self):
@@ -93,6 +75,58 @@ class User(db.Model):
             "location": self.location,
             "image": self.image_url
         }
+
+    @property
+    def matches(self):
+        # TODO: Fix this quick and dirty solution
+        # incredibly terrible solution
+
+        like = []
+        liked_by = []
+
+        matches = []
+
+        users_I_like = Match.query.filter_by(
+            user1_username=self.username,
+            is_liked=True
+        ).all()
+
+        like += [match.user2_username for match in users_I_like]
+
+        users_liked_by = Match.query.filter_by(
+            user2_username=self.username,
+            is_liked=True
+
+        )
+
+        liked_by += [match.user1_username for match in users_liked_by]
+
+        for user in liked_by:
+            if user in like:
+                matches.append(user)
+
+        return matches
+
+    @property
+    def exclude_users_in_match(self):
+        """Exclude users in match or already seen."""
+
+        results = []
+
+        users_seen = Match.query.filter_by(
+            user1_username=self.username
+        ).all()
+
+        results += [match.user2_username for match in users_seen]
+
+        users_who_disliked = Match.query.filter_by(
+            user2_username=self.username,
+            is_liked=False
+        )
+
+        results += [match.user1_username for match in users_who_disliked]
+        return results
+
 
     @classmethod
     def signup(cls, username, email, location, friend_radius, bio, password, first_name, last_name, image_url):
@@ -147,23 +181,8 @@ class User(db.Model):
 
         return False
 
-    # def is_followed_by(self, other_user):
-    #     """Is this user followed by `other_user`?"""
-
-    #     found_user_list = [
-    #         user for user in self.followers if user == other_user]
-    #     return len(found_user_list) == 1
-
-    # def is_following(self, other_user):
-    #     """Is this user following `other_use`?"""
-
-    #     found_user_list = [
-    #         user for user in self.following if user == other_user]
-    #     return len(found_user_list) == 1
-
 
 class Match(db.Model):
-    """Connection of a follower <-> followed_user."""
 
     __tablename__ = 'matches'
 
@@ -185,15 +204,17 @@ class Match(db.Model):
     )
 
     @classmethod
-    def createLikeStatus(user1, user2, is_liked):
-        m = Match(user1_username=user1, user2_username=user2, is_liked=is_liked)
+    def createLikeStatus(cls, u1, u2, is_liked):
+        m = Match(
+            user1_username=u1,
+            user2_username=u2,
+            is_liked=is_liked
+        )
         db.session.add(m)
         db.session.commit()
-
         return m
 
 
-#BOTTOM
 def connect_db(app):
     """Connect this database to provided Flask app.
 
