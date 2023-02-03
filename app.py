@@ -125,8 +125,6 @@ def find_friends(username):
 
 @app.get("/matches/<username>")
 def list_matches(username):
-    """ TODO: Show matches """
-
     current_user = User.query.get_or_404(username)
     matched_users = current_user.matches
 
@@ -143,9 +141,13 @@ def get_user(username):
 @app.post('/likes')
 def like_or_dislike():
     data = request.get_json()
-    # breakpoint()
-    match = Match.createLikeStatus(
-        u1=data["u1"], u2=data["u2"], is_liked=data["like_status"])
-    print("match=", match)
+
+    other_user = Match.createLikeStatus(
+        u1=data["u1"],
+        u2=data["u2"],
+        is_liked=data["like_status"]
+    )
+
     db.session.commit()
-    return jsonify(status="ok")
+
+    return (jsonify(data=other_user), 201)

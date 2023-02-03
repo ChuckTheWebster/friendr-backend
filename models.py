@@ -212,7 +212,7 @@ class Match(db.Model):
         )
         db.session.add(m)
         db.session.commit()
-        return m
+        return m.user2_username
 
 
 def connect_db(app):
